@@ -1,0 +1,19 @@
+{
+  "name": "flowdock-stream",
+  "version": "0.0.2",
+  "description": "A streaming client for flowdock flows",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "keywords": [
+    "flowdock"
+  ],
+  "author": "Olli Kankare",
+  "license": "MIT",
+  "dependencies": {
+    "validjson": "~0.1.0",
+    "request": "~2.34.0"
+  }
+}
