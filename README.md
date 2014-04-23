@@ -45,4 +45,8 @@ __FlowdockStream.getUsers(__ *callback* __)__
 
 
 __FlowdockStream.send(__ *message*, [*commentToId*], [*callback*] __)__
-    - Function that can be used to send messages to the flow. The message is a string, and optionally you can pass an message-id as the second argument to send the message as a comment to a previous message. Also takes an optional callback which is passed to the underlying *request* module.
+    - Function that can be used to send messages to the flow. Optionally you can pass an message-id as the second argument to send the message as a comment to a previous message. Also takes an optional callback which is passed to the underlying *request* module.
+
+License
+-------
+http://ok.mit-license.org

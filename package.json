@@ -1,16 +1,20 @@
 {
   "name": "flowdock-stream",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A streaming client for flowdock flows",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gildean/node-flowdock-stream"
+  },
   "keywords": [
-    "flowdock"
+    "flowdock",
+    "stream"
   ],
-  "author": "Olli Kankare",
+  "author": "Olli Kankare <olli@salaliitto.com>",
   "license": "MIT",
   "dependencies": {
     "validjson": "~0.1.0",
