@@ -14,7 +14,10 @@ Usage
 
 ```js
 var FlowdockStream = require('flowdock-stream');
-var flowdockstream = FlowdockStream.createClient('organization', ['flow', 'another'], 'personal-apikey');
+var org = 'organization';
+var flows = ['flow', 'another'];
+var apikey = 'personal-apikey';
+var flowdockstream = FlowdockStream.createClient(org, flows, apikey);
 
 flowdockstream.on('ready', function () {
     console.log('flowdockstream is ready, current users in the flows:\r\n', flowdockstream.flows);
@@ -48,7 +51,7 @@ __FlowdockStream.createClient(__ *organization*, *flows*, *apikey* __)__
     
   - all three arguments are mandatory, the apikey is a __personal apikey__, not an apikey of a flow (the module accesses the REST-API that requires the personal key)
   - the `flows` argument can be either a string (for a sinlge flow) or an array (for multiple flows)
-  - the stream will emit a `ready` event once the stream is about to start emitting data and the `flowUsers` property has been set
+  - the stream will emit a `ready` event once the stream is about to start emitting data and the `flows` property has been set
 
 The stream itself is a readable node.js stream, but added are a couple of methods for convenience:
 
