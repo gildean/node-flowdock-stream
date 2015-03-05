@@ -15,6 +15,10 @@ Usage
 var FlowdockStream = require('flowdock-stream');
 var flowdockstream = FlowdockStream.createClient('organization', 'flow', 'apikey');
 
+flowdockstream.on('ready', function () {
+    console.log('flowdockstream is ready, current users in the flow:', flowdockstream.flowUsers);
+});
+
 flowdockstream.on('data', function flowDockEventHandler(data) {
     if (data.event === 'message') {
         var from = (data.user) ? flowdockstream.flowUsers[data.user] : null;
@@ -41,7 +45,7 @@ A stream is created with the only exported function as follows:
 __FlowdockStream.createClient(__ *organization*, *flow*, *apikey* __)__
     
   - all three arguments are mandatory, the apikey is a __personal apikey__, not an apikey of a flow (the bot accesses the REST-API that requires the personal key)
-
+  - the stream will emit a `ready` event once the stream is about to start emitting data and the `flowUsers` property has been set
 
 The stream itself is a readable node.js stream, but added are a couple of methods for convenience:
 
