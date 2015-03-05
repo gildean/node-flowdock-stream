@@ -8,12 +8,12 @@ function StreamingClient(org, flow, apikey) {
     PassThrough.call(this);
     this._writableState.objectMode = true;
     this._readableState.objectMode = true;
-    this.org = org;
-    this.flow = flow;
+    this.org = org.toLowerCase();
+    this.flow = flow.toLowerCase();
     this.apikey = apikey;
     this.apiuri = 'https://api.flowdock.com/flows';
     this.streamuri = 'https://stream.flowdock.com/flows';
-    this.urikey =  org + '/' + flow;
+    this.urikey =  this.org + '/' + this.flow;
 }
 
 // "private" methods
@@ -55,6 +55,7 @@ StreamingClient.prototype.getUsers = function getUsers(callback) {
     var jsonParser = new JSONParseStream();
     jsonParser.once('data', function getUserData(data) {
         jsonParser.removeAllListeners();
+        if (data.message || data.error && data.error.message) return callback(new Error(data.message || data.error.message));
         return callback(null, data.reduce(function nickReducer(obj, user) {
             if (user.hasOwnProperty('id') && user.hasOwnProperty('nick')) obj[user.id] = user.nick;
             return obj;
