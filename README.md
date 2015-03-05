@@ -16,7 +16,15 @@ var FlowdockStream = require('flowdock-stream');
 var flowdockstream = FlowdockStream.createClient('organization', 'flow', 'apikey');
 
 flowdockstream.on('data', function flowDockEventHandler(data) {
-    if (data.event === 'message') console.log('a message!', data.content);
+    if (data.event === 'message') {
+        var from = (data.user) ? flowdockstream.flowUsers[data.user] : null;
+        console.log('a message from', from, data.content);
+    } else if (data.event === 'join') {
+        flowdockstream.getUsers(function setUsers(err, users) {
+            if (err) return flowdockstream.emit('error', err);
+            flowdockstream.flowUsers = users;
+        });
+    }
 });
 
 flowdockstream.on('error', function realGoodErrorHandler(err) {
