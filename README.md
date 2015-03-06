@@ -20,7 +20,7 @@ var apikey = 'personal-apikey';
 var flowdockStream = FlowdockStream.createClient(org, flows, apikey);
 
 flowdockStream.on('ready', function () {
-    console.log('flowdockstream is ready, flows:\r\n', flowdockStream.flows);
+    console.log('flowdockStream is ready, flows:\r\n', flowdockStream.flows);
 });
 
 flowdockStream.on('data', function flowDockEventHandler(data) {
@@ -38,7 +38,7 @@ flowdockStream.on('data', function flowDockEventHandler(data) {
     }
 });
 
-flowdockstream.on('error', function realGoodErrorHandler(err) {
+flowdockStream.on('error', function realGoodErrorHandler(err) {
     throw err;
 });
 ```
