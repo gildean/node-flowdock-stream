@@ -17,21 +17,23 @@ var FlowdockStream = require('flowdock-stream');
 var org = 'organization';
 var flows = ['flow', 'another'];
 var apikey = 'personal-apikey';
-var flowdockstream = FlowdockStream.createClient(org, flows, apikey);
+var flowdockStream = FlowdockStream.createClient(org, flows, apikey);
 
-flowdockstream.on('ready', function () {
-    console.log('flowdockstream is ready, current users in the flows:\r\n', flowdockstream.flows);
+flowdockStream.on('ready', function () {
+    console.log('flowdockstream is ready, flows:\r\n', flowdockStream.flows);
 });
 
-flowdockstream.on('data', function flowDockEventHandler(data) {
+flowdockStream.on('data', function flowDockEventHandler(data) {
+    var sourceFlow = flowdockStream.flows[data.flow];
     if (data.event === 'message') {
-        var from = (data.user) ? flowdockstream.flows[data.flow].users[data.user] : null;
+        var from = (data.user) ? sourceFlow.users[data.user] : null;
         console.log('a message from', from, data.content);
     } else if (data.event === 'join') {
-        flowdockstream.getUsers(flowdockstream.flows[data.flow].name, function setUsers(err, users) {
-            if (err) return flowdockstream.emit('error', err);
-            flowdockstream.flows[data.flow].users = users;
-            flowdockstream.send(flowdockstream.flows[data.flow].name, 'Hello ' + users[data.user]);
+        var flowName = sourceFlow.name;
+        flowdockStream.getUsers(flowName, function setUsers(err, users) {
+            if (err) return flowdockStream.emit('error', err);
+            sourceFlow.users = users;
+            flowdockStream.send(flowName, 'Hello ' + users[data.user]);
         });
     }
 });
@@ -53,7 +55,7 @@ __FlowdockStream.createClient(__ *organization*, *flows*, *apikey* __)__
   - the `flows` argument can be either a string (for a sinlge flow) or an array (for multiple flows)
   - the stream will emit a `ready` event once the stream is about to start emitting data and the `flows` property has been set
 
-The stream itself is a readable node.js stream, but added are a couple of methods for convenience:
+The stream itself is a readable node.js stream in object-mode (each `data`-event holds a complete object), but added are a couple of methods for convenience:
 
 __flowdockStream.flows__
     
@@ -72,7 +74,7 @@ __flowdockStream.getUsers(__ *flow*, *callback* __)__
 
 __flowdockStream.send(__ *flow*, *message*, [*commentToId*], [*callback*] __)__
 
-  - Function that can be used to send a `message` to the `flow` (you can pick the flow-name from the flows-object by the id in an event-callback). Optionally you can pass an message-id as the third argument to send the message as a comment to a previous message. Also takes an optional callback which is passed to the underlying *request* module.
+  - Function that can be used to send a `message` to the `flow` (you can pick the flow-name from the flows-object by the id in an event-callback, see the example). Optionally you can pass an message-id as the third argument to send the message as a comment to a previous message. Also takes an optional callback which is passed to the underlying *request* module.
 
 
 License

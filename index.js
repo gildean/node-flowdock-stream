@@ -2,8 +2,8 @@ var request = require('request');
 var JSONParseStream = require('./jsonparser.js');
 var PassThrough = require('stream').PassThrough;
 
-function parameterized(flowName) {
-    return flowName.toLowerCase().replace(/ /g, '-');
+function parameterize(name) {
+    return name.toLowerCase().replace(/ /g, '-');
 }
 
 function nickReducer(obj, user) {
@@ -17,22 +17,21 @@ function StreamingClient(org, flow, apikey) {
     PassThrough.call(this);
     this._writableState.objectMode = true;
     this._readableState.objectMode = true;
-    this.org = org.toLowerCase();
+    this.org = parameterize(org);
     this.apikey = apikey;
     this.apiuri = 'https://api.flowdock.com/flows';
     this.streamuri = 'https://stream.flowdock.com/flows';
-    this.flow = ('string' === typeof flow) ? [parameterized(flow)] : flow.map(parameterized);
-    var self = this;
+    this.flow = ('string' === typeof flow) ? [parameterize(flow)] : flow.map(parameterize);
     this.flowMap = {};
 }
 
 // "private" methods
 StreamingClient.prototype._streamParser = new JSONParseStream();
-StreamingClient.prototype._getSendOpts = function _getSendOpts(flow, message, messageId) {
-    var self = this;
+StreamingClient.prototype._getSendOpts = function _getSendOpts(flowId, message, messageId) {
     var comment = (messageId) ? '/' + messageId + '/comments' : '';
+    var uri = this.apiuri + '/' + this.flows[flowId].urikey + '/messages' + comment;
     return {
-        uri: self.apiuri + '/' + self.flows[flow.toLowerCase()].urikey + '/messages' + comment,
+        uri: uri,
         method: 'POST',
         json: {
             event: (messageId) ? 'comment' : 'message',
@@ -55,16 +54,15 @@ StreamingClient.prototype._createStreams = function _createStreams() {
     var self = this;
     var filter = '?filter=' + Object.keys(this.flows).map(function (flow) { return self.flows[flow].urikey; }).join(',');
     var url = this.streamuri + filter
-    request.get(url).auth(self.apikey, '', true).pipe(self._streamParser).pipe(self);
+    request.get(url).auth(this.apikey, '', true).pipe(this._streamParser).pipe(this);
     this.emit('ready');
 };
 
 // public methods
 StreamingClient.prototype.send = function send(flow, message, messageId, cb) {
-    var self = this;
     if ('function' === typeof messageId) cb = messageId;
-    var options = this._getSendOpts(this.flowMap[parameterized(flow)], message, messageId);
-    return request(options).auth(self.apikey, '', true, cb);
+    var options = this._getSendOpts(this.flowMap[parameterize(flow)], message, messageId);
+    return request(options).auth(this.apikey, '', true, cb);
 };
 
 StreamingClient.prototype.getUsers = function getUsers(flowName, callback) {
@@ -79,7 +77,8 @@ StreamingClient.prototype.getUsers = function getUsers(flowName, callback) {
         jsonParser.removeAllListeners();
         return callback(err, null);
     });
-    return request.get(self.apiuri + '/' + self.flows[self.flowMap[parameterized(flowName)]].urikey + '/users').auth(self.apikey, '', true).pipe(jsonParser);
+    var url = this.apiuri + '/' + this.flows[this.flowMap[parameterize(flowName)]].urikey + '/users';
+    return request.get(url).auth(this.apikey, '', true).pipe(jsonParser);
 };
 
 StreamingClient.prototype.getFlows = function getUsers(callback) {
@@ -106,7 +105,7 @@ StreamingClient.prototype.getFlows = function getUsers(callback) {
         jsonParser.removeAllListeners();
         return callback(err);
     });
-    return request.get(self.apiuri + '?users=1').auth(self.apikey, '', true).pipe(jsonParser);
+    return request.get(this.apiuri + '?users=1').auth(this.apikey, '', true).pipe(jsonParser);
 };
 
 var flowdock = {
