@@ -81,7 +81,7 @@ StreamingClient.prototype.getUsers = function getUsers(flowName, callback) {
     return request.get(url).auth(this.apikey, '', true).pipe(jsonParser);
 };
 
-StreamingClient.prototype.getFlows = function getUsers(callback) {
+StreamingClient.prototype.getFlows = function getFlows(callback) {
     var self = this;
     var jsonParser = new JSONParseStream();
     jsonParser.once('data', function getUserData(data) {
