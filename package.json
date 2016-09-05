@@ -1,6 +1,6 @@
 {
   "name": "flowdock-stream",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A streaming client for flowdock flows",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   "author": "Olli Kankare <olli@salaliitto.com>",
   "license": "MIT",
   "dependencies": {
-    "validjson": "~0.1.0",
-    "request": "~2.34.0"
+    "request": "^2.74.0",
+    "validjson": "~0.1.0"
   }
 }
