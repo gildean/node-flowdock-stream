@@ -12,7 +12,7 @@ function nickReducer(obj, user) {
 }
 
 require('util').inherits(StreamingClient, PassThrough);
-function StreamingClient(org, flow, apikey) {
+function StreamingClient(org, flow, apikey, requestOpts) {
     if (!(this instanceof StreamingClient)) return new StreamingClient(org, flow, apikey);
     PassThrough.call(this);
     this._writableState.objectMode = true;
@@ -23,6 +23,8 @@ function StreamingClient(org, flow, apikey) {
     this.streamuri = 'https://stream.flowdock.com/flows';
     this.flow = ('string' === typeof flow) ? [parameterize(flow)] : flow.map(parameterize);
     this.flowMap = {};
+    this.requestOpts = requestOpts || {};
+    this.request = request.defaults(this.requestOpts);
 }
 
 // "private" methods
@@ -54,7 +56,7 @@ StreamingClient.prototype._createStreams = function _createStreams() {
     var self = this;
     var filter = '?filter=' + Object.keys(this.flows).map(function (flow) { return self.flows[flow].urikey; }).join(',');
     var url = this.streamuri + filter
-    request.get(url).auth(this.apikey, '', true).pipe(this._streamParser).pipe(this);
+    this.request.get(url).auth(this.apikey, '', true).pipe(this._streamParser).pipe(this);
     this.emit('ready');
 };
 
@@ -62,7 +64,7 @@ StreamingClient.prototype._createStreams = function _createStreams() {
 StreamingClient.prototype.send = function send(flow, message, messageId, cb) {
     if ('function' === typeof messageId) cb = messageId;
     var options = this._getSendOpts(this.flowMap[parameterize(flow)], message, messageId);
-    return request(options).auth(this.apikey, '', true, cb);
+    return this.request(options).auth(this.apikey, '', true, cb);
 };
 
 StreamingClient.prototype.getUsers = function getUsers(flowName, callback) {
@@ -78,7 +80,7 @@ StreamingClient.prototype.getUsers = function getUsers(flowName, callback) {
         return callback(err, null);
     });
     var url = this.apiuri + '/' + this.flows[this.flowMap[parameterize(flowName)]].urikey + '/users';
-    return request.get(url).auth(this.apikey, '', true).pipe(jsonParser);
+    return this.request.get(url).auth(this.apikey, '', true).pipe(jsonParser);
 };
 
 StreamingClient.prototype.getFlows = function getFlows(callback) {
@@ -105,13 +107,13 @@ StreamingClient.prototype.getFlows = function getFlows(callback) {
         jsonParser.removeAllListeners();
         return callback(err);
     });
-    return request.get(this.apiuri + '?users=1').auth(this.apikey, '', true).pipe(jsonParser);
+    return this.request.get(this.apiuri + '?users=1').auth(this.apikey, '', true).pipe(jsonParser);
 };
 
 var flowdock = {
-    createClient: function createClient(org, flow, apikey) {
+    createClient: function createClient(org, flow, apikey, requestOpts) {
         if (!org || !flow || !apikey) throw new Error('missing arguments; org, flow and apikey required');
-        var sclient = new StreamingClient(org, flow, apikey)._init();
+        var sclient = new StreamingClient(org, flow, apikey, requestOpts)._init();
         return sclient;
     }
 };

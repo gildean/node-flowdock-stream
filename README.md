@@ -1,5 +1,5 @@
-flowdock-stream v.1
-===================
+flowdock-stream
+===============
 
 A node module for streaming flowdock flows.
 NOTE: for the older API, check version 0.1.3.

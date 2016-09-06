@@ -1,6 +1,6 @@
 {
   "name": "flowdock-stream",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "A streaming client for flowdock flows",
   "main": "index.js",
   "scripts": {
