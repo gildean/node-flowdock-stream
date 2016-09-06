@@ -17,7 +17,8 @@ var FlowdockStream = require('flowdock-stream');
 var org = 'organization';
 var flows = ['flow', 'another'];
 var apikey = 'personal-apikey';
-var flowdockStream = FlowdockStream.createClient(org, flows, apikey);
+var defaultRequestOptions = { proxy: 'http://user:pass@proxyserver' };
+var flowdockStream = FlowdockStream.createClient(org, flows, apikey, defaultRequestOptions);
 
 flowdockStream.on('ready', function () {
     console.log('flowdockStream is ready, flows:\r\n', flowdockStream.flows);
@@ -49,10 +50,11 @@ Public methods
 A stream is created with the only exported function as follows:
 
 
-__FlowdockStream.createClient(__ *organization*, *flows*, *apikey* __)__
+__FlowdockStream.createClient(__ *organization*, *flows*, *apikey*, *defaultRequestOptions* __)__
     
-  - all three arguments are mandatory, the apikey is a __personal apikey__, not an apikey of a flow (the module accesses the REST-API that requires the personal key)
+  - first three arguments are mandatory, the apikey is a __personal apikey__, not an apikey of a flow (the module accesses the REST-API that requires the personal key)
   - the `flows` argument can be either a string (for a sinlge flow) or an array (for multiple flows)
+  - the `defaultRequestOptions` is an object passed to the underlying `request`-module to use as default options
   - the stream will emit a `ready` event once the stream is about to start emitting data and the `flows` property has been set
 
 The stream itself is a readable node.js stream in object-mode (each `data`-event holds a complete object), but added are a couple of methods for convenience:
